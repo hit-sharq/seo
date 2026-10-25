@@ -1,0 +1,229 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Brand {
+  id              String   @id @default(cuid())
+  name            String
+  domain          String   @unique
+  blogDomain      String?
+  targetKeywords  String[]
+  competitors     String[]
+  gscProperty     String?
+  ga4Property     String?
+  locationCode    Int      @default(2250)
+  languageCode    String   @default("en")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  keywords        Keyword[]
+  keywordPositions KeywordPosition[]
+  backlinks       Backlink[]
+  technicalAudits TechnicalAudit[]
+  contentPages    ContentPage[]
+  reports         Report[]
+  alerts          Alert[]
+
+  @@index([domain])
+}
+
+model Keyword {
+  id              String   @id @default(cuid())
+  brandId         String
+  brand           Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  keyword         String
+  volume          Int      @default(0)
+  cpc             Float    @default(0)
+  difficulty      Float    @default(0)
+  intent          String   @default("informational")
+  clusterId       String?
+  targetUrl       String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  positions       KeywordPosition[]
+
+  @@unique([brandId, keyword])
+  @@index([brandId])
+  @@index([clusterId])
+}
+
+model KeywordPosition {
+  id              String   @id @default(cuid())
+  keywordId       String
+  keyword         Keyword  @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+  brandId         String
+  brand           Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  position        Int?
+  previousPosition Int?
+  url             String
+  title           String
+  snippet         String
+  searchVolume    Int      @default(0)
+  keywordDifficulty Float   @default(0)
+  checkedAt       DateTime @default(now())
+
+  @@index([keywordId])
+  @@index([brandId, checkedAt])
+  @@index([checkedAt])
+}
+
+model CompetitorSnapshot {
+  id              String   @id @default(cuid())
+  brandId         String
+  competitorDomain String
+  totalKeywords   Int      @default(0)
+  estimatedTraffic Int     @default(0)
+  topPages        Json
+  keywords        Json
+  capturedAt      DateTime @default(now())
+
+  @@index([brandId, competitorDomain, capturedAt])
+}
+
+model Backlink {
+  id              String   @id @default(cuid())
+  brandId         String
+  brand           Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  sourceUrl       String
+  targetUrl       String
+  anchor          String
+  domainRating    Int      @default(0)
+  pageRating      Int      @default(0)
+  isNew           Boolean  @default(false)
+  isLost          Boolean  @default(false)
+  toxicityScore   Float    @default(0)
+  linkType        String   @default("dofollow")
+  firstSeen       DateTime @default(now())
+  lastSeen        DateTime @default(now())
+
+  @@index([brandId])
+  @@index([targetUrl])
+  @@index([firstSeen])
+  @@index([isNew, isLost])
+}
+
+model TechnicalAudit {
+  id              String   @id @default(cuid())
+  brandId         String
+  brand           Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  lcp             Float
+  inp             Float
+  cls             Float
+  fcp             Float
+  ttfb            Float
+  performanceScore Int
+  indexationRate  Float
+  crawlErrors     Json
+  schemaCoverage  Json
+  checkedAt       DateTime @default(now())
+
+  @@index([brandId, checkedAt])
+}
+
+model ContentPage {
+  id                String   @id @default(cuid())
+  brandId           String
+  brand             Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  url               String   @unique
+  title             String
+  targetKeyword     String
+  wordCount         Int      @default(0)
+  contentScore      Float    @default(0)
+  optimizationScore Float    @default(0)
+  lastOptimizedAt   DateTime?
+  publishedAt       DateTime
+  status            String   @default("draft")
+
+  @@index([brandId])
+  @@index([targetKeyword])
+  @@index([status])
+}
+
+model ContentBrief {
+  id              String   @id @default(cuid())
+  brandId         String
+  targetKeyword   String
+  searchIntent    String
+  recommendedWordCount Int
+  suggestedHeadings String[]
+  faqQuestions    String[]
+  entitiesToCover String[]
+  competitorContent Json
+  internalLinkOpportunities String[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([brandId, targetKeyword])
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  brandId     String
+  brand       Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  type        String
+  status      String   @default("generating")
+  data        Json
+  generatedAt DateTime @default(now())
+  sentAt      DateTime?
+
+  @@index([brandId, generatedAt])
+}
+
+model Alert {
+  id          String   @id @default(cuid())
+  brandId     String
+  brand       Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  type        String
+  severity    String
+  message     String
+  data        Json
+  acknowledged Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([brandId, createdAt])
+  @@index([acknowledged])
+}
+
+model KeywordCluster {
+  id          String   @id @default(cuid())
+  brandId     String
+  name        String
+  keywords    String[]
+  createdAt   DateTime @default(now())
+
+  @@index([brandId])
+}
+
+model ScheduledTask {
+  id          String   @id @default(cuid())
+  name        String
+  type        String
+  cron        String
+  payload     Json
+  enabled     Boolean  @default(true)
+  lastRun     DateTime?
+  nextRun     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([enabled, nextRun])
+}
+
+model BrandConfig {
+  id              String   @id @default(cuid())
+  brandId         String   @unique
+  gscEnabled      Boolean  @default(false)
+  ga4Enabled      Boolean  @default(false)
+  dataforseoEnabled Boolean @default(true)
+  alertWebhook    String?
+  alertEmail      String?
+  slackWebhook    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
