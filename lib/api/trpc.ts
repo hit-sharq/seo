@@ -6,9 +6,14 @@ import { ZodError } from 'zod';
 const prisma = new PrismaClient();
 
 export const createTRPCContext = async (opts: { headers: Headers }) => {
+  const authHeader = opts.headers.get('authorization');
+  const apiKey = authHeader?.replace('Bearer ', '');
+
   return {
     prisma,
     headers: opts.headers,
+    apiKey,
+    isAuthenticated: Boolean(apiKey && apiKey === process.env.NEXT_PUBLIC_API_KEY),
   };
 };
 
@@ -26,8 +31,18 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
 });
 
 export const createTRPCRouter = t.router;
+
+// Public procedures — no auth needed (brand selector, etc.)
 export const publicProcedure = t.procedure;
-export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
+
+// Protected procedures — require valid API key
+export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
+  if (!ctx.isAuthenticated) {
+    throw new TRPCError({
+      code: 'UNAUTHORIZED',
+      message: 'Invalid or missing API key',
+    });
+  }
   return next();
 });
 
