@@ -1,4 +1,4 @@
-import { createTRPCRouter } from './lib/trpc';
+import { createTRPCRouter } from './trpc';
 import { brandRouter } from './routers/brand';
 import { keywordRouter } from './routers/keyword';
 import { contentRouter } from './routers/content';

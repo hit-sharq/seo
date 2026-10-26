@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { createTRPCRouter, publicProcedure } from '../lib/trpc';
+import { createTRPCRouter, publicProcedure } from '../trpc';
 import { createDataForSEOClient } from '../../../lib/dataforseo';
 
 export const keywordRouter = createTRPCRouter({
