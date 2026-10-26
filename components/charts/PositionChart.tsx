@@ -57,7 +57,7 @@ export function PositionChart({ brandId }: PositionChartProps) {
                   padding: '8px 12px',
                   boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.08)',
                 }}
-                formatter={(value: number) => [value.toFixed(1), 'Avg Position']}
+                formatter={(value: number) => `${value.toFixed(1)} Avg Position`}
                 itemStyle={{ color: '#1f2937', fontSize: 12 }}
                 labelStyle={{ color: '#6b7280', fontSize: 12 }}
               />
