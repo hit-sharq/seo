@@ -8,7 +8,7 @@ export class DataForSEOClient {
   constructor(config: DataForSEOConfig) {
     this.config = config;
     const auth = Buffer.from(`${config.login}:${config.password}`).toString('base64');
-    
+
     this.client = axios.create({
       baseURL: config.baseUrl || 'https://api.dataforseo.com/v3',
       headers: {
@@ -40,7 +40,7 @@ export class DataForSEOClient {
 
   async getBulkSERP(requests: SERPRequest[]): Promise<Map<string, SERPResult[]>> {
     const results = new Map<string, SERPResult[]>();
-    
+
     for (let i = 0; i < requests.length; i += 20) {
       const batch = requests.slice(i, i + 20);
       const payload = batch.map(r => ({
@@ -50,10 +50,10 @@ export class DataForSEOClient {
         device: r.device,
         depth: r.depth || 100,
       }));
-      
+
       const response: any = await this.client.post('/serp/google/organic/live/advanced', payload);
       const tasks = response.tasks || [];
-      
+
       tasks.forEach((task: any, idx: number) => {
         const keyword = batch[idx]?.keyword;
         if (keyword && task.result?.[0]?.items) {
@@ -73,9 +73,7 @@ export class DataForSEOClient {
     const response: any = await this.client.post('/dataforseo_labs/google/ranked_keywords/live', [{
       target: domain,
       location_code: locationCode,
-      language_code: languageCode,
       limit,
-      filters: [['rank_group', '<=', 100]],
     }]);
     return response.tasks?.[0]?.result?.[0] || { target: domain, location_code: locationCode, language_code: languageCode, total_count: 0, items: [] };
   }
@@ -91,7 +89,6 @@ export class DataForSEOClient {
       target1,
       target2,
       location_code: locationCode,
-      language_code: languageCode,
       limit,
     }]);
     return response.tasks?.[0]?.result?.[0] || { target1, target2, intersection: [] };
@@ -105,7 +102,6 @@ export class DataForSEOClient {
     const response: any = await this.client.post('/dataforseo_labs/google/domain_rank_overview/live', [{
       target: domain,
       location_code: locationCode,
-      language_code: languageCode,
     }]);
     return response.tasks?.[0]?.result?.[0] || { target: domain, total_keywords: 0, estimated_traffic: 0, top_pages: [] };
   }
@@ -163,10 +159,10 @@ export class DataForSEOClient {
 export function createDataForSEOClient(): DataForSEOClient {
   const login = process.env.DATAFORSEO_LOGIN;
   const password = process.env.DATAFORSEO_PASSWORD;
-  
+
   if (!login || !password) {
     throw new Error('DATAFORSEO_LOGIN and DATAFORSEO_PASSWORD must be set in environment');
   }
-  
+
   return new DataForSEOClient({ login, password, baseUrl: 'https://api.dataforseo.com/v3' });
 }
