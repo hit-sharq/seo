@@ -2,7 +2,6 @@
   "name": "seo-command-center",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "npm@10.8.3",
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",
