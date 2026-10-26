@@ -3,7 +3,9 @@ import { createTRPCRouter, publicProcedure } from '../trpc';
 import { createDataForSEOClient } from '../../../lib/dataforseo';
 
 export const brandRouter = createTRPCRouter({
-  getAll: publicProcedure.query(async ({ ctx }) => {
+  getAll: publicProcedure
+    .input(z.object({}).optional())
+    .query(async ({ ctx }) => {
     return ctx.prisma.brand.findMany({
       orderBy: { createdAt: 'desc' },
       include: {

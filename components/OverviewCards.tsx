@@ -26,12 +26,12 @@ const cardVariants: Record<string, { bg: string; text: string; glow: string; ico
 };
 
 export function OverviewCards({ brandId }: OverviewCardsProps) {
-  const { data: brand } = trpc.brand.getById.useQuery({ id: brandId });
+  const { data: brand } = trpc.brand.getById.useQuery({ id: brandId }, { enabled: !!brandId });
   const { data: keywords } = trpc.keyword.getAll.useQuery({
     brandId,
     limit: 100,
-  });
-  const { data: backlinks } = trpc.backlinks.getSummary.useQuery({ brandId });
+  }, { enabled: !!brandId });
+  const { data: backlinks } = trpc.backlinks.getSummary.useQuery({ brandId }, { enabled: !!brandId });
 
   const totalKeywords = brand?._count.keywords || 0;
   const totalBacklinks = backlinks?.total || 0;

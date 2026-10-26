@@ -22,7 +22,7 @@ export function CWVChart({ brandId }: CWVChartProps) {
   const { data, isLoading } = trpc.technical.getCWVTrends.useQuery({
     brandId,
     days: 30,
-  });
+  }, { enabled: !!brandId });
 
   const chartData = (data || []).map((a: any) => ({
     date: format(new Date(a.date), 'MMM d'),

@@ -22,7 +22,7 @@ export function PositionChart({ brandId }: PositionChartProps) {
   const { data, isLoading } = trpc.keyword.getAggregatePositionHistory.useQuery({
     brandId,
     days: 30,
-  });
+  }, { enabled: !!brandId });
 
   const chartData = (data || []).map((a: any) => ({
     date: format(new Date(a.date), 'MMM d'),

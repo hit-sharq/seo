@@ -14,7 +14,7 @@ export function KeywordTable({ brandId, className }: KeywordTableProps) {
   const { data, isLoading } = trpc.keyword.getAll.useQuery({
     brandId,
     limit: 20,
-  });
+  }, { enabled: !!brandId });
 
   if (isLoading) {
     return (
