@@ -18,6 +18,13 @@ function estimateTraffic(volume: number, position: number | null): number {
   return volume * (ctrByPosition[position] || 0);
 }
 
+const cardVariants: Record<string, { bg: string; text: string; glow: string; icon: string }> = {
+  keywords: { bg: 'bg-primary-50', text: 'text-primary-600', glow: 'shadow-[0_0_20px_rgba(79,70,229,0.15)]', icon: 'text-primary-600' },
+  position: { bg: 'bg-green-50', text: 'text-green-600', glow: 'shadow-[0_0_20px_rgba(16,185,129,0.15)]', icon: 'text-green-600' },
+  traffic: { bg: 'bg-blue-50', text: 'text-blue-600', glow: 'shadow-[0_0_20px_rgba(59,130,246,0.15)]', icon: 'text-blue-600' },
+  backlinks: { bg: 'bg-orange-50', text: 'text-orange-600', glow: 'shadow-[0_0_20px_rgba(245,158,11,0.15)]', icon: 'text-orange-600' },
+};
+
 export function OverviewCards({ brandId }: OverviewCardsProps) {
   const { data: brand } = trpc.brand.getById.useQuery({ id: brandId });
   const { data: keywords } = trpc.keyword.getAll.useQuery({
@@ -42,124 +49,78 @@ export function OverviewCards({ brandId }: OverviewCardsProps) {
   const estTraffic =
     kwList.reduce((sum: number, k: any) => sum + estimateTraffic(k.volume, k.currentPosition), 0) || 0;
 
+  const cards = [
+    {
+      variant: 'keywords',
+      label: 'Total Keywords',
+      value: totalKeywords.toLocaleString(),
+      subLabel: 'live from API',
+      subValue: '',
+      icon: (
+        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+        </svg>
+      ),
+    },
+    {
+      variant: 'position',
+      label: 'Avg Position',
+      value: avgPosition > 0 ? avgPosition.toFixed(1) : '—',
+      subLabel: `${positionsWithData.length} keywords with positions`,
+      subValue: '',
+      icon: <ArrowUpIcon className="h-6 w-6" />,
+    },
+    {
+      variant: 'traffic',
+      label: 'Est. Traffic',
+      value: Math.round(estTraffic).toLocaleString(),
+      subLabel: 'based on volume & position',
+      subValue: '',
+      icon: (
+        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      ),
+    },
+    {
+      variant: 'backlinks',
+      label: 'Backlinks',
+      value: totalBacklinks.toLocaleString(),
+      subLabel: `${backlinks?.new || 0} new this week`,
+      subValue: '',
+      icon: (
+        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+        </svg>
+      ),
+    },
+  ];
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <Card className="p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-500">Total Keywords</p>
-            <p className="text-3xl font-bold text-gray-900 mt-1">
-              {totalKeywords.toLocaleString()}
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      {cards.map((card) => {
+        const vars = cardVariants[card.variant];
+        return (
+          <Card key={card.variant} className={`p-6 ${vars.bg} border ${vars.glow} hover:shadow-xl transition-all duration-300`}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">
+                  {card.label}
+                </p>
+                <p className="text-3xl font-bold text-gray-900 tracking-tight">
+                  {card.value}
+                </p>
+              </div>
+              <div className={`p-3 rounded-xl ${vars.bg.replace('-50', '-100')} ${vars.icon}`}>
+                {card.icon}
+              </div>
+            </div>
+            <p className="mt-3 text-sm text-gray-500 flex items-center gap-1">
+              {card.subLabel}
             </p>
-          </div>
-          <div className="p-3 bg-blue-100 rounded-full text-blue-600">
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-              />
-            </svg>
-          </div>
-        </div>
-        <p className="mt-2 text-sm text-green-600 flex items-center">
-          <span className="mr-1">live</span> from API
-        </p>
-      </Card>
-
-      <Card className="p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-500">Avg Position</p>
-            <p className="text-3xl font-bold text-gray-900 mt-1">
-              {avgPosition > 0 ? avgPosition.toFixed(1) : '—'}
-            </p>
-          </div>
-          <div className="p-3 bg-green-100 rounded-full text-green-600">
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 10l7-7m0 0l7 7m-7 7v18"
-              />
-            </svg>
-          </div>
-        </div>
-        <p className="mt-2 text-sm text-green-600 flex items-center">
-          <ArrowUpIcon className="h-4 w-4 mr-1" />
-          {positionsWithData.length} keywords with positions
-        </p>
-      </Card>
-
-      <Card className="p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-500">Est. Traffic</p>
-            <p className="text-3xl font-bold text-gray-900 mt-1">
-              {Math.round(estTraffic).toLocaleString()}
-            </p>
-          </div>
-          <div className="p-3 bg-purple-100 rounded-full text-purple-600">
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-              />
-            </svg>
-          </div>
-        </div>
-        <p className="mt-2 text-sm text-green-600 flex items-center">
-          <span className="mr-1">based on volume & position</span>
-        </p>
-      </Card>
-
-      <Card className="p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-500">Backlinks</p>
-            <p className="text-3xl font-bold text-gray-900 mt-1">
-              {totalBacklinks.toLocaleString()}
-            </p>
-          </div>
-          <div className="p-3 bg-orange-100 rounded-full text-orange-600">
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-              />
-            </svg>
-          </div>
-        </div>
-        <p className="mt-2 text-sm text-green-600 flex items-center">
-          <span className="mr-1">{backlinks?.new || 0}</span> new this week
-        </p>
-      </Card>
+          </Card>
+        );
+      })}
     </div>
   );
 }

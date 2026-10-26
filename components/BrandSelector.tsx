@@ -25,24 +25,22 @@ export function BrandSelector({ onChange }: BrandSelectorProps) {
           aria-expanded={open}
           aria-haspopup="listbox"
         >
-          <span>
+          <span className="truncate">
             {brands?.find((b: any) => b.id === '')?.name || 'Select a brand...'}
           </span>
           <ChevronDownIcon
-            className={`h-5 w-5 text-gray-500 transition-transform ${
-              true ? 'rotate-180' : ''
-            }`}
+            className={`h-5 w-5 text-gray-500 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
           />
         </button>
 
         {open && (
-          <ul className="absolute z-10 mt-1 w-full bg-white rounded-lg shadow-lg border border-gray-200 max-h-60 overflow-auto">
+          <ul className="absolute z-50 mt-2 w-full bg-white rounded-xl shadow-xl border border-gray-100 max-h-60 overflow-auto animate-slide-in">
             <li
               onClick={() => {
                 onChange(null);
                 setOpen(false);
               }}
-              className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+              className="px-4 py-3 text-sm text-gray-600 hover:bg-gray-50 cursor-pointer transition-colors"
             >
               All Brands
             </li>
@@ -53,9 +51,10 @@ export function BrandSelector({ onChange }: BrandSelectorProps) {
                   onChange(brand.id);
                   setOpen(false);
                 }}
-                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                className="px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer transition-colors"
               >
-                {brand.name} ({brand.domain})
+                <div className="font-medium">{brand.name}</div>
+                <div className="text-xs text-gray-500">{brand.domain}</div>
               </li>
             ))}
           </ul>

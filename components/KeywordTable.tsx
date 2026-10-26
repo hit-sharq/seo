@@ -7,9 +7,10 @@ import { ArrowUpIcon, ArrowDownIcon, MinusIcon } from '@heroicons/react/24/outli
 
 interface KeywordTableProps {
   brandId: string;
+  className?: string;
 }
 
-export function KeywordTable({ brandId }: KeywordTableProps) {
+export function KeywordTable({ brandId, className }: KeywordTableProps) {
   const { data, isLoading } = trpc.keyword.getAll.useQuery({
     brandId,
     limit: 20,
@@ -17,28 +18,30 @@ export function KeywordTable({ brandId }: KeywordTableProps) {
 
   if (isLoading) {
     return (
-      <div className="card p-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-100 rounded w-1/4" />
+      <Card className="p-6 animate-slide-in">
+        <div className="space-y-4">
+          <div className="h-8 bg-gray-100 rounded w-1/4 animate-pulse" />
           <div className="space-y-3">
             {[...Array(5)].map((_, i: number) => (
-              <div key={i} className="h-12 bg-gray-100 rounded" />
+              <div key={i} className="h-12 bg-gray-100 rounded animate-pulse" />
             ))}
           </div>
         </div>
-      </div>
+      </Card>
     );
   }
 
   const keywords = data?.keywords || [];
 
   return (
-    <div className="card">
-      <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900">Top Keywords</h3>
-        <span className="text-sm text-gray-500">{keywords.length} keywords tracked</span>
+    <Card className={`p-0 border overflow-hidden ${className || ''}`}>
+      <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900">Top Keywords</h3>
+          <p className="text-sm text-gray-500">{keywords.length} keywords tracked</p>
+        </div>
       </div>
-      <Table>
+      <Table className="mt-0">
         <TableHeader>
           <TableRow>
             <TableHeaderCell>Keyword</TableHeaderCell>
@@ -71,15 +74,15 @@ export function KeywordTable({ brandId }: KeywordTableProps) {
             }
 
             return (
-              <TableRow key={kw.id} className="hover:bg-gray-50">
+              <TableRow key={kw.id} className="hover:bg-gray-50 transition-colors">
                 <TableCell className="font-medium text-gray-900 max-w-xs truncate">
                   {kw.keyword}
                 </TableCell>
-                <TableCell className="text-right font-mono">
+                <TableCell className="text-right font-mono text-gray-900">
                   {currentPos ? currentPos : <span className="text-gray-400">—</span>}
                 </TableCell>
                 <TableCell className="text-right">
-                  <span className={`${changeClass} items-center justify-end gap-1`}>
+                  <span className={`flex items-center gap-1 ${changeClass}`}>
                     {changeIcon}
                     {currentPos && prevPos && Math.abs(currentPos - prevPos)}
                   </span>
@@ -103,6 +106,6 @@ export function KeywordTable({ brandId }: KeywordTableProps) {
           })}
         </TableBody>
       </Table>
-    </div>
+    </Card>
   );
 }

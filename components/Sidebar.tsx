@@ -32,18 +32,18 @@ export function Sidebar({ open, onClose }: SidebarProps) {
   return (
     <>
       <div
-        className={`fixed inset-0 z-40 bg-gray-900/50 transition-opacity lg:hidden ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        className={`fixed inset-0 z-40 bg-gray-900/40 backdrop-blur-sm transition-opacity lg:hidden ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         onClick={onClose}
         aria-hidden="true"
       />
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${open ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 lg:static lg:inset-auto lg:border-r-0 lg:border-b lg:border-b-gray-200 ${open ? 'translate-x-0' : '-translate-x-full'}`}
         aria-label="Sidebar"
       >
-        <div className="flex h-16 items-center px-6 border-b border-gray-200">
-          <span className="text-xl font-bold text-primary-600">SEO Command Center</span>
+        <div className="flex h-16 items-center px-6 border-b border-gray-200 lg:hidden">
+          <span className="text-xl font-bold text-primary-600 tracking-tight">SEO Command Center</span>
         </div>
-        <nav className="flex-1 p-4 space-y-1 overflow-y-auto" aria-label="Main navigation">
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto lg:px-4 lg:py-4" aria-label="Main navigation">
           {navigation.map((item) => {
             const isActive =
               pathname === item.href ||
@@ -52,14 +52,14 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               <Link
                 key={item.name}
                 href={item.href}
-                className={`flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${
+                className={`flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all ${
                   isActive
-                    ? 'bg-primary-50 text-primary-700'
-                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                    ? 'bg-primary-50 text-primary-700 shadow-sm'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`}
               >
                 <item.icon
-                  className={`h-5 w-5 mr-3 ${isActive ? 'text-primary-600' : 'text-gray-400'}`}
+                  className={`h-5 w-5 shrink-0 ${isActive ? 'text-primary-600' : 'text-gray-400'}`}
                   aria-hidden="true"
                 />
                 {item.name}
@@ -67,8 +67,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             );
           })}
         </nav>
-        <div className="p-4 border-t border-gray-200">
-          <p className="text-xs text-gray-500 text-center">SEO Command Center v0.1</p>
+        <div className="p-3 border-t border-gray-100 lg:p-4">
+          <p className="text-xs text-gray-400 text-center font-medium tracking-tight uppercase">SEO Command Center v0.1</p>
         </div>
       </aside>
     </>
