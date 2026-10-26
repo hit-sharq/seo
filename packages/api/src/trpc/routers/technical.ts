@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { createTRPCRouter, publicProcedure } from '../lib/trpc';
+import { createTRPCRouter, publicProcedure } from '../../lib/trpc';
 import { createDataForSEOClient } from '@seo-command-center/shared';
 
 export const technicalRouter = createTRPCRouter({

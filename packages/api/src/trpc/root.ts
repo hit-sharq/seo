@@ -1,10 +1,10 @@
 import { createTRPCRouter } from '../lib/trpc';
-import { brandRouter } from './brand';
-import { keywordRouter } from './keyword';
-import { contentRouter } from './content';
-import { technicalRouter } from './technical';
-import { backlinksRouter } from './backlinks';
-import { reportsRouter } from './reports';
+import { brandRouter } from './routers/brand';
+import { keywordRouter } from './routers/keyword';
+import { contentRouter } from './routers/content';
+import { technicalRouter } from './routers/technical';
+import { backlinksRouter } from './routers/backlinks';
+import { reportsRouter } from './routers/reports';
 
 export const appRouter = createTRPCRouter({
   brand: brandRouter,
