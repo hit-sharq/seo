@@ -4,23 +4,28 @@ import { createDataForSEOClient } from '../../../lib/dataforseo';
 
 export const backlinksRouter = createTRPCRouter({
   getAll: publicProcedure
-    .input(z.object({
-      brandId: z.string(),
-      limit: z.number().default(50),
-      cursor: z.string().optional(),
-      filter: z.object({
-        isNew: z.boolean().optional(),
-        isLost: z.boolean().optional(),
-        toxicityMin: z.number().optional(),
-        linkType: z.string().optional(),
-      }).optional(),
-    })
+    .input(
+      z.object({
+        brandId: z.string(),
+        limit: z.number().default(50),
+        cursor: z.string().optional(),
+        filter: z
+          .object({
+            isNew: z.boolean().optional(),
+            isLost: z.boolean().optional(),
+            toxicityMin: z.number().optional(),
+            linkType: z.string().optional(),
+          })
+          .optional(),
+      })
+    )
     .query(async ({ ctx, input }) => {
       const where: any = { brandId: input.brandId };
       if (input.filter) {
         if (input.filter.isNew !== undefined) where.isNew = input.filter.isNew;
         if (input.filter.isLost !== undefined) where.isLost = input.filter.isLost;
-        if (input.filter.toxicityMin) where.toxicityScore = { gte: input.filter.toxicityMin };
+        if (input.filter.toxicityMin)
+          where.toxicityScore = { gte: input.filter.toxicityMin };
         if (input.filter.linkType) where.linkType = input.filter.linkType;
       }
 
@@ -43,16 +48,23 @@ export const backlinksRouter = createTRPCRouter({
   getSummary: publicProcedure
     .input(z.object({ brandId: z.string() }))
     .query(async ({ ctx, input }) => {
-      const [total, newCount, lostCount, toxicCount, avgDR] = await Promise.all([
-        ctx.prisma.backlink.count({ where: { brandId: input.brandId } }),
-        ctx.prisma.backlink.count({ where: { brandId: input.brandId, isNew: true } }),
-        ctx.prisma.backlink.count({ where: { brandId: input.brandId, isLost: true } }),
-        ctx.prisma.backlink.count({ where: { brandId: input.brandId, toxicityScore: { gte: 50 } } }),
-        ctx.prisma.backlink.aggregate({
-          where: { brandId: input.brandId },
-          _avg: { domainRating: true },
-        }),
-      );
+      const [total, newCount, lostCount, toxicCount, avgDR] =
+        await Promise.all([
+          ctx.prisma.backlink.count({ where: { brandId: input.brandId } }),
+          ctx.prisma.backlink.count({
+            where: { brandId: input.brandId, isNew: true },
+          }),
+          ctx.prisma.backlink.count({
+            where: { brandId: input.brandId, isLost: true },
+          }),
+          ctx.prisma.backlink.count({
+            where: { brandId: input.brandId, toxicityScore: { gte: 50 } },
+          }),
+          ctx.prisma.backlink.aggregate({
+            where: { brandId: input.brandId },
+            _avg: { domainRating: true },
+          }),
+        ]);
 
       return {
         total,
@@ -64,10 +76,12 @@ export const backlinksRouter = createTRPCRouter({
     }),
 
   fetchBacklinks: publicProcedure
-    .input(z.object({
-      brandId: z.string(),
-      limit: z.number().default(1000),
-    }))
+    .input(
+      z.object({
+        brandId: z.string(),
+        limit: z.number().default(1000),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
       const brand = await ctx.prisma.brand.findUnique({
         where: { id: input.brandId },
@@ -123,8 +137,6 @@ export const backlinksRouter = createTRPCRouter({
         }
       }
 
-      // Mark old backlinks as lost if not seen in this fetch
-      // This is a simplified approach - in production you'd want a more robust method
       const lostCount = await ctx.prisma.backlink.updateMany({
         where: {
           brandId: input.brandId,
@@ -134,15 +146,21 @@ export const backlinksRouter = createTRPCRouter({
         data: { isLost: true },
       });
 
-      return { newCount, updatedCount: newCount, lostCount: lostCount.count };
+      return {
+        newCount,
+        updatedCount: newCount,
+        lostCount: lostCount.count,
+      };
     }),
 
   getToxicLinks: publicProcedure
-    .input(z.object({
-      brandId: z.string(),
-      threshold: z.number().default(50),
-      limit: z.number().default(50),
-    })
+    .input(
+      z.object({
+        brandId: z.string(),
+        threshold: z.number().default(50),
+        limit: z.number().default(50),
+      })
+    )
     .query(async ({ ctx, input }) => {
       return ctx.prisma.backlink.findMany({
         where: {
@@ -175,14 +193,16 @@ export const backlinksRouter = createTRPCRouter({
     }),
 
   getReferringDomains: publicProcedure
-    .input(z.object({ brandId: z.string(), limit: z.number().default(50) }))
+    .input(
+      z.object({ brandId: z.string(), limit: z.number().default(50) })
+    )
     .query(async ({ ctx, input }) => {
       const backlinks = await ctx.prisma.backlink.findMany({
         where: { brandId: input.brandId },
         select: { sourceUrl: true, domainRating: true },
       });
 
-      const domains: Record<string, { count: number; avgDR: number }> = {};
+      const domains: Record<string, { count: number; totalDR: number }> = {};
       for (const bl of backlinks) {
         try {
           const url = new URL(bl.sourceUrl);

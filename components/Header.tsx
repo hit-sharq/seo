@@ -1,6 +1,6 @@
 'use client';
 
-import { MenuIcon, BellIcon, UserCircleIcon } from '@heroicons/react/24/outline';
+import { MinusIcon, BellIcon, UserCircleIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
 
 interface HeaderProps {
@@ -21,7 +21,7 @@ export function Header({ onMenuClick }: HeaderProps) {
             className="lg:hidden p-2 -ml-2 text-gray-500 hover:text-gray-700"
             aria-label="Open menu"
           >
-            <MenuIcon className="h-6 w-6" aria-hidden="true" />
+            <MinusIcon className="h-6 w-6" aria-hidden="true" />
           </button>
           <div className="lg:hidden ml-4">
             <span className="text-xl font-bold text-primary-600">SEO Command Center</span>

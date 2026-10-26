@@ -4,12 +4,14 @@ import { createDataForSEOClient } from '../../../lib/dataforseo';
 
 export const contentRouter = createTRPCRouter({
   getAll: publicProcedure
-    .input(z.object({
-      brandId: z.string(),
-      limit: z.number().default(50),
-      cursor: z.string().optional(),
-      status: z.string().optional(),
-    })
+    .input(
+      z.object({
+        brandId: z.string(),
+        limit: z.number().default(50),
+        cursor: z.string().optional(),
+        status: z.string().optional(),
+      })
+    )
     .query(async ({ ctx, input }) => {
       const where: any = { brandId: input.brandId };
       if (input.status) where.status = input.status;
@@ -18,7 +20,7 @@ export const contentRouter = createTRPCRouter({
         where,
         take: input.limit + 1,
         cursor: input.cursor ? { id: input.cursor } : undefined,
-        orderBy: { updatedAt: 'desc' },
+        orderBy: { updatedAt: 'desc' } as any,
       });
 
       let nextCursor: string | undefined;
@@ -39,15 +41,17 @@ export const contentRouter = createTRPCRouter({
     }),
 
   create: publicProcedure
-    .input(z.object({
-      brandId: z.string(),
-      url: z.string().url(),
-      title: z.string(),
-      targetKeyword: z.string(),
-      wordCount: z.number().default(0),
-      publishedAt: z.date(),
-      status: z.string().default('draft'),
-    }))
+    .input(
+      z.object({
+        brandId: z.string(),
+        url: z.string().url(),
+        title: z.string(),
+        targetKeyword: z.string(),
+        wordCount: z.number().default(0),
+        publishedAt: z.date(),
+        status: z.string().default('draft'),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
       return ctx.prisma.contentPage.create({
         data: input,
@@ -55,31 +59,40 @@ export const contentRouter = createTRPCRouter({
     }),
 
   update: publicProcedure
-    .input(z.object({
-      id: z.string(),
-      url: z.string().url().optional(),
-      title: z.string().optional(),
-      targetKeyword: z.string().optional(),
-      wordCount: z.number().optional(),
-      contentScore: z.number().optional(),
-      optimizationScore: z.number().optional(),
-      lastOptimizedAt: z.date().optional().nullable(),
-      status: z.string().optional(),
-    }))
+    .input(
+      z.object({
+        id: z.string(),
+        url: z.string().url().optional(),
+        title: z.string().optional(),
+        targetKeyword: z.string().optional(),
+        wordCount: z.number().optional(),
+        publishedAt: z.date().optional(),
+        status: z.string().optional(),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
       const { id, ...data } = input;
       return ctx.prisma.contentPage.update({
-        where: { id: input.id },
+        where: { id },
         data,
       });
     }),
 
-  // Get content brief for a keyword
-  getBrief: publicProcedure
-    .input(z.object({
-      brandId: z.string(),
-      targetKeyword: z.string(),
-    }))
+  delete: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      return ctx.prisma.contentPage.delete({
+        where: { id: input.id },
+      });
+    }),
+
+  generateBrief: publicProcedure
+    .input(
+      z.object({
+        brandId: z.string(),
+        targetKeyword: z.string(),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
       const brand = await ctx.prisma.brand.findUnique({
         where: { id: input.brandId },
@@ -88,8 +101,6 @@ export const contentRouter = createTRPCRouter({
       if (!brand) throw new Error('Brand not found');
 
       const client = createDataForSEOClient();
-      
-      // Get SERP for target keyword
       const serp = await client.getSERP({
         keyword: input.targetKeyword,
         location_code: brand.locationCode,
@@ -98,13 +109,11 @@ export const contentRouter = createTRPCRouter({
         depth: 10,
       });
 
-      // Get top competitors
       const competitorDomains = serp
         .slice(0, 5)
-        .map(r => r.domain)
+        .map((r) => r.domain)
         .filter((d, i, arr) => arr.indexOf(d) === i);
 
-      // Get competitor content analysis
       const competitorContent = [];
       for (const domain of competitorDomains) {
         try {
@@ -112,7 +121,6 @@ export const contentRouter = createTRPCRouter({
           if (onPage) {
             competitorContent.push({
               domain,
-              // Extract relevant data from on-page analysis
             });
           }
         } catch (e) {
@@ -120,16 +128,15 @@ export const contentRouter = createTRPCRouter({
         }
       }
 
-      // Get keyword data for entities
       const keywordData = await client.getKeywordsData(
         [input.targetKeyword],
-        2250, // Kenya
+        2250,
         'en'
       );
 
       const brief = {
         targetKeyword: input.targetKeyword,
-        searchIntent: 'informational', // Could be determined from SERP
+        searchIntent: 'informational',
         recommendedWordCount: 1500,
         suggestedHeadings: [
           `What is ${input.targetKeyword}?`,
@@ -150,19 +157,17 @@ export const contentRouter = createTRPCRouter({
       return brief;
     }),
 
-  // Score content against target keyword
   scoreContent: publicProcedure
-    .input(z.object({
-      url: z.string().url(),
-      targetKeyword: z.string(),
-    }))
+    .input(
+      z.object({
+        url: z.string().url(),
+        targetKeyword: z.string(),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
       const client = createDataForSEOClient();
       const result = await client.getOnPageScore(input.url);
-      
-      // Calculate scores based on on-page analysis
-      // This is simplified - real implementation would be more complex
-      
+
       return {
         url: input.url,
         targetKeyword: input.targetKeyword,
@@ -183,7 +188,6 @@ export const contentRouter = createTRPCRouter({
   getOptimizationOpportunities: publicProcedure
     .input(z.object({ brandId: z.string() }))
     .query(async ({ ctx, input }) => {
-      // Find pages with low optimization scores
       return ctx.prisma.contentPage.findMany({
         where: {
           brandId: input.brandId,

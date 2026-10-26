@@ -24,7 +24,7 @@ export function PositionChart({ brandId }: PositionChartProps) {
     days: 30,
   });
 
-  const chartData = (data || []).map((a) => ({
+  const chartData = (data || []).map((a: any) => ({
     date: format(new Date(a.date), 'MMM d'),
     avgPosition: a.avgPosition,
   }));

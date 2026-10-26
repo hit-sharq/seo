@@ -13,10 +13,12 @@ export const technicalRouter = createTRPCRouter({
     }),
 
   getAuditHistory: publicProcedure
-    .input(z.object({
-      brandId: z.string(),
-      days: z.number().default(90),
-    }))
+    .input(
+      z.object({
+        brandId: z.string(),
+        days: z.number().default(90),
+      })
+    )
     .query(async ({ ctx, input }) => {
       const since = new Date();
       since.setDate(since.getDate() - input.days);
@@ -42,7 +44,6 @@ export const technicalRouter = createTRPCRouter({
       const client = createDataForSEOClient();
       const audit = await client.getTechnicalAudit(brand.domain);
 
-      // Parse audit results - this is simplified
       const auditData = {
         lcp: audit?.lcp || 0,
         inp: audit?.inp || 0,
@@ -66,10 +67,12 @@ export const technicalRouter = createTRPCRouter({
     }),
 
   getCWVTrends: publicProcedure
-    .input(z.object({
-      brandId: z.string(),
-      days: z.number().default(90),
-    }))
+    .input(
+      z.object({
+        brandId: z.string(),
+        days: z.number().default(90),
+      })
+    )
     .query(async ({ ctx, input }) => {
       const since = new Date();
       since.setDate(since.getDate() - input.days);
@@ -107,8 +110,6 @@ export const technicalRouter = createTRPCRouter({
   getIndexationRate: publicProcedure
     .input(z.object({ brandId: z.string() }))
     .query(async ({ ctx, input }) => {
-      // This would ideally come from GSC API
-      // For now, return latest audit data
       const latest = await ctx.prisma.technicalAudit.findFirst({
         where: { brandId: input.brandId },
         orderBy: { checkedAt: 'desc' },
@@ -131,7 +132,9 @@ export const technicalRouter = createTRPCRouter({
     }),
 
   getCrawlErrors: publicProcedure
-    .input(z.object({ brandId: z.string(), limit: z.number().default(50) }))
+    .input(
+      z.object({ brandId: z.string(), limit: z.number().default(50) })
+    )
     .query(async ({ ctx, input }) => {
       const latest = await ctx.prisma.technicalAudit.findFirst({
         where: { brandId: input.brandId },
@@ -139,6 +142,6 @@ export const technicalRouter = createTRPCRouter({
         select: { crawlErrors: true, checkedAt: true },
       });
 
-      return latest?.crawlErrors?.slice(0, input.limit) || [];
+      return (latest?.crawlErrors as any[] | undefined)?.slice(0, input.limit) || [];
     }),
 });

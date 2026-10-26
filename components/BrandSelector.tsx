@@ -26,7 +26,7 @@ export function BrandSelector({ onChange }: BrandSelectorProps) {
           aria-haspopup="listbox"
         >
           <span>
-            {brands?.find((b) => b.id === '')?.name || 'Select a brand...'}
+            {brands?.find((b: any) => b.id === '')?.name || 'Select a brand...'}
           </span>
           <ChevronDownIcon
             className={`h-5 w-5 text-gray-500 transition-transform ${
@@ -46,7 +46,7 @@ export function BrandSelector({ onChange }: BrandSelectorProps) {
             >
               All Brands
             </li>
-            {brands?.map((brand) => (
+            {brands?.map((brand: any) => (
               <li
                 key={brand.id}
                 onClick={() => {

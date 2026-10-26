@@ -59,7 +59,7 @@ export function CompetitorView({ brandId }: CompetitorViewProps) {
             </thead>
             <tbody>
               {competitorsLoading ? (
-                competitors.map((domain) => (
+                competitors.map((domain: string) => (
                   <tr key={domain} className="animate-pulse">
                     <td className="px-4 py-3">{domain}</td>
                     <td className="px-4 py-3 text-right">
@@ -74,7 +74,7 @@ export function CompetitorView({ brandId }: CompetitorViewProps) {
                   </tr>
                 ))
               ) : (
-                competitors.map((domain, i) => {
+                competitors.map((domain: string, i: number) => {
                   const overview = competitorOverviews?.[i];
                   return (
                     <tr key={domain} className="hover:bg-gray-50">
@@ -121,7 +121,7 @@ export function CompetitorView({ brandId }: CompetitorViewProps) {
             </tr>
           </thead>
           <tbody>
-            {ourKeywords.map((kw) => (
+            {ourKeywords.map((kw: any) => (
               <tr key={kw.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3 font-medium text-gray-900 max-w-xs truncate">
                   {kw.keyword}

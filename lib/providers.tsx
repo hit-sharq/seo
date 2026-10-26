@@ -24,9 +24,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
       links: [
         httpBatchLink({
           url: `${process.env.API_URL || 'http://localhost:3000'}/api/trpc`,
-          transformer: superjson,
         }),
       ],
+      transformer: superjson,
     })
   );
 

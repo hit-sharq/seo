@@ -11,16 +11,8 @@ interface OverviewCardsProps {
 function estimateTraffic(volume: number, position: number | null): number {
   if (!position || position <= 0) return 0;
   const ctrByPosition: Record<number, number> = {
-    1: 0.285,
-    2: 0.157,
-    3: 0.11,
-    4: 0.08,
-    5: 0.07,
-    6: 0.05,
-    7: 0.04,
-    8: 0.035,
-    9: 0.03,
-    10: 0.025,
+    1: 0.285, 2: 0.157, 3: 0.11, 4: 0.08, 5: 0.07,
+    6: 0.05, 7: 0.04, 8: 0.035, 9: 0.03, 10: 0.025,
   };
   if (position > 10) return 0;
   return volume * (ctrByPosition[position] || 0);
@@ -39,16 +31,16 @@ export function OverviewCards({ brandId }: OverviewCardsProps) {
 
   const kwList = keywords?.keywords || [];
   const positionsWithData = kwList.filter(
-    (k) => k.currentPosition !== null && k.currentPosition !== undefined
+    (k: any) => k.currentPosition !== null && k.currentPosition !== undefined
   );
   const avgPosition =
     positionsWithData.length > 0
-      ? positionsWithData.reduce((sum, k) => sum + (k.currentPosition || 0), 0) /
+      ? positionsWithData.reduce((sum: number, k: any) => sum + (k.currentPosition || 0), 0) /
         positionsWithData.length
       : 0;
 
   const estTraffic =
-    kwList.reduce((sum, k) => sum + estimateTraffic(k.volume, k.currentPosition), 0) || 0;
+    kwList.reduce((sum: number, k: any) => sum + estimateTraffic(k.volume, k.currentPosition), 0) || 0;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

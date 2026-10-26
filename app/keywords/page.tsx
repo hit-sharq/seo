@@ -2,7 +2,7 @@
 
 import { trpc } from '@/lib/trpc';
 import { useState } from 'react';
-import { SearchIcon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { Card } from '@/components/ui/Card';
 import { Table, TableHeader, TableBody, TableRow, TableHeaderCell, TableCell } from '@/components/ui/Card';
 
@@ -64,7 +64,7 @@ export default function KeywordsPage() {
             className="input flex-1"
           />
           <button onClick={handleFetch} className="btn btn-primary">
-            <SearchIcon className="h-5 w-5 mr-2" /> Fetch Keywords
+            <MagnifyingGlassIcon className="h-5 w-5 mr-2" /> Fetch Keywords
           </button>
         </div>
         <Card className="p-6">
@@ -140,7 +140,7 @@ export default function KeywordsPage() {
           disabled={!domain.trim()}
           className="btn btn-primary"
         >
-          <SearchIcon className="h-5 w-5 mr-2" /> Fetch Keywords
+          <MagnifyingGlassIcon className="h-5 w-5 mr-2" /> Fetch Keywords
         </button>
       </div>
 
@@ -174,7 +174,7 @@ export default function KeywordsPage() {
                 </TableCell>
               </TableRow>
             ) : (
-              keywords.map((kw) => (
+              keywords.map((kw: KeywordRow) => (
                 <TableRow key={kw.keyword} className="hover:bg-gray-50">
                   <TableCell className="font-medium text-gray-900 max-w-xs truncate">
                     {kw.keyword}

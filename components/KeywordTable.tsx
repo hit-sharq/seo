@@ -1,6 +1,7 @@
 'use client';
 
 import { trpc } from '@/lib/trpc';
+import { Card } from '@/components/ui/Card';
 import { Table, TableHeader, TableBody, TableRow, TableHeaderCell, TableCell, Badge } from '@/components/ui/Card';
 import { ArrowUpIcon, ArrowDownIcon, MinusIcon } from '@heroicons/react/24/outline';
 
@@ -20,7 +21,7 @@ export function KeywordTable({ brandId }: KeywordTableProps) {
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-gray-100 rounded w-1/4" />
           <div className="space-y-3">
-            {[...Array(5)].map((_, i) => (
+            {[...Array(5)].map((_, i: number) => (
               <div key={i} className="h-12 bg-gray-100 rounded" />
             ))}
           </div>
@@ -50,7 +51,7 @@ export function KeywordTable({ brandId }: KeywordTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {keywords.map((kw) => {
+          {keywords.map((kw: any) => {
             const currentPos = kw.currentPosition;
             const prevPos = kw.previousPosition;
             let changeIcon = null;
@@ -78,7 +79,7 @@ export function KeywordTable({ brandId }: KeywordTableProps) {
                   {currentPos ? currentPos : <span className="text-gray-400">—</span>}
                 </TableCell>
                 <TableCell className="text-right">
-                  <span className={changeClass} flex items-center justify-end gap-1>
+                  <span className={`${changeClass} items-center justify-end gap-1`}>
                     {changeIcon}
                     {currentPos && prevPos && Math.abs(currentPos - prevPos)}
                   </span>

@@ -3,10 +3,12 @@ import { createTRPCRouter, publicProcedure } from '../trpc';
 
 export const reportsRouter = createTRPCRouter({
   getAll: publicProcedure
-    .input(z.object({
-      brandId: z.string(),
-      limit: z.number().default(20),
-    }))
+    .input(
+      z.object({
+        brandId: z.string(),
+        limit: z.number().default(20),
+      })
+    )
     .query(async ({ ctx, input }) => {
       return ctx.prisma.report.findMany({
         where: { brandId: input.brandId },
@@ -26,8 +28,6 @@ export const reportsRouter = createTRPCRouter({
   generateWeekly: publicProcedure
     .input(z.object({ brandId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      // This would aggregate data from the past week
-      // For now, create a placeholder report
       const report = await ctx.prisma.report.create({
         data: {
           brandId: input.brandId,
@@ -49,8 +49,6 @@ export const reportsRouter = createTRPCRouter({
         },
       });
 
-      // In real implementation, this would be async with a job queue
-      // For now, mark as ready with placeholder data
       await ctx.prisma.report.update({
         where: { id: report.id },
         data: {
@@ -89,8 +87,16 @@ export const reportsRouter = createTRPCRouter({
           status: 'ready',
           data: {
             period: {
-              start: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1),
-              end: new Date(new Date().getFullYear(), new Date().getMonth(), 0),
+              start: new Date(
+                new Date().getFullYear(),
+                new Date().getMonth() - 1,
+                1
+              ),
+              end: new Date(
+                new Date().getFullYear(),
+                new Date().getMonth(),
+                0
+              ),
             },
             summary: {
               totalKeywords: 200,
