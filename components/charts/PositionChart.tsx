@@ -72,7 +72,10 @@ export function PositionChart({ brandId }: PositionChartProps) {
       {chartData.length > 0 && (
         <div className="mt-4 text-center">
           <p className="text-sm text-gray-500">
-            Latest avg position: <span className="font-medium text-gray-900">{chartData[chartData.length - 1].avgPosition.toFixed(1)}</span>
+            Latest avg position:
+            <span className="font-medium text-gray-900">
+              {(chartData[chartData.length - 1].avgPosition ?? 0).toFixed(1)}
+            </span>
           </p>
         </div>
       )}

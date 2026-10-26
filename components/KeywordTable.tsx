@@ -85,7 +85,7 @@ export function KeywordTable({ brandId }: KeywordTableProps) {
                   </span>
                 </TableCell>
                 <TableCell className="text-right text-gray-600 font-mono">
-                  {kw.volume.toLocaleString()}
+                  {(kw.volume ?? 0).toLocaleString()}
                 </TableCell>
                 <TableCell className="text-right text-gray-600">
                   {kw.difficulty?.toFixed(1) || '—'}

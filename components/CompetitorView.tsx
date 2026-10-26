@@ -132,7 +132,7 @@ export function CompetitorView({ brandId }: CompetitorViewProps) {
                     : '—'}
                 </td>
                 <td className="px-4 py-3 text-right font-mono text-gray-600">
-                  {kw.volume.toLocaleString()}
+                  {(kw.volume ?? 0).toLocaleString()}
                 </td>
                 <td className="px-4 py-3 text-right text-gray-600">
                   {kw.difficulty?.toFixed(1) || '—'}

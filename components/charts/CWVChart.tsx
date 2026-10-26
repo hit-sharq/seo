@@ -96,15 +96,21 @@ export function CWVChart({ brandId }: CWVChartProps) {
         {latest ? (
           <>
             <div className="p-3 bg-red-50 rounded-lg">
-              <p className="text-2xl font-bold text-red-600">{latest.lcp.toFixed(1)}s</p>
+              <p className="text-2xl font-bold text-red-600">
+                {(latest?.lcp ?? 0).toFixed(1)}s
+              </p>
               <p className="text-xs text-gray-500">LCP (Good {'<'} 2.5s)</p>
             </div>
             <div className="p-3 bg-blue-50 rounded-lg">
-              <p className="text-2xl font-bold text-blue-600">{Math.round(latest.inp)}ms</p>
+              <p className="text-2xl font-bold text-blue-600">
+                {Math.round(latest?.inp ?? 0)}ms
+              </p>
               <p className="text-xs text-gray-500">INP (Good {'<'} 200ms)</p>
             </div>
             <div className="p-3 bg-green-50 rounded-lg">
-              <p className="text-2xl font-bold text-green-600">{latest.cls.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-green-600">
+                {(latest?.cls ?? 0).toFixed(2)}
+              </p>
               <p className="text-xs text-gray-500">CLS (Good {'<'} 0.1)</p>
             </div>
           </>

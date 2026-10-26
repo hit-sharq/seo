@@ -196,13 +196,13 @@ export default function KeywordsPage() {
                     {kw.position !== null ? kw.position : '—'}
                   </TableCell>
                   <TableCell className="text-right text-gray-600 font-mono">
-                    {kw.searchVolume.toLocaleString()}
+                    {(kw.searchVolume ?? 0).toLocaleString()}
                   </TableCell>
                   <TableCell className="text-right text-gray-600">
                     {kw.keywordDifficulty?.toFixed(1) || '—'}
                   </TableCell>
                   <TableCell className="text-right text-gray-600 font-mono">
-                    ${kw.cpc.toFixed(2)}
+                    ${(kw.cpc ?? 0).toFixed(2)}
                   </TableCell>
                   <TableCell>
                     <span className="badge badge-info">{kw.intent}</span>
