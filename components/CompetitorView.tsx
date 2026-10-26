@@ -10,11 +10,11 @@ interface CompetitorViewProps {
 }
 
 export function CompetitorView({ brandId, className }: CompetitorViewProps) {
-  const { data: brand } = trpc.brand.getById.useQuery({ id: brandId });
+  const { data: brand } = trpc.brand.getById.useQuery({ id: brandId }, { enabled: !!brandId });
   const { data: keywords } = trpc.keyword.getAll.useQuery({
     brandId,
     limit: 20,
-  });
+  }, { enabled: !!brandId });
   const { data: competitorOverviews, isLoading: competitorsLoading } =
     trpc.brand.getCompetitorsOverview.useQuery(
       {
