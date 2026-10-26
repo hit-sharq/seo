@@ -39,8 +39,8 @@ turbo.json.lock
 turbo/
 .turbo/
 
-# Prisma
-prisma/migrations/
+# Prisma - ignore dev.db but commit migrations for production deploys
+prisma/migrations/dev/
 *.db
 
 # Misc
