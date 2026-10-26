@@ -91,14 +91,16 @@ export const technicalRouter = createTRPCRouter({
         },
       });
 
-      return audits.map(a => ({
-        date: a.checkedAt,
-        lcp: a.lcp,
-        inp: a.inp,
-        cls: a.cls,
-        fcp: a.fcp,
-        ttfb: a.ttfb,
-        score: a.performanceScore,
+      return audits.map((a) => {
+        return {
+          date: a.checkedAt,
+          lcp: a.lcp,
+          inp: a.inp,
+          cls: a.cls,
+          fcp: a.fcp,
+          ttfb: a.ttfb,
+          score: a.performanceScore,
+        };
       });
     }),
 
