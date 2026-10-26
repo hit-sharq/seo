@@ -23,7 +23,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     trpc.createClient({
       links: [
         httpBatchLink({
-          url: `${process.env.API_URL || 'http://localhost:3000'}/api/trpc`,
+          url: '/api/trpc',
           headers: () => ({
             authorization: `Bearer ${process.env.NEXT_PUBLIC_API_KEY || ''}`,
           }),
